@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: argocd-backupper
+  namespace: argocd
+spec:
+  #Execute every hour
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: argocd-backupper
+          containers:
+          - name: argocd-backupper
+            image: obstdev/argocd-backupper
+            volumeMounts:
+            - mountPath: /home/argocd/backup/
+              name: backup-volume
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-volume
+            persistentVolumeClaim:
+              claimName: argocd-backup-pvc

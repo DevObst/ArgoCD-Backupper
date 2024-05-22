@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  schedule: "{{ .Values.app.cron }}"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ .Values.app.name }}
+          containers:
+          - name: {{ .Values.app.name }}
+            image:  "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            volumeMounts:
+            - mountPath: /home/argocd/backup/
+              name: backup-volume
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-volume
+            persistentVolumeClaim:
+              claimName: {{ .Values.app.name }}-pvc

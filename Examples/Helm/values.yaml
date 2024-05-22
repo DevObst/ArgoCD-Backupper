@@ -1,0 +1,8 @@
+image:
+  tag: "1.1"
+  repository: obstdev/argocd-backupper
+
+app:
+  name: argocd-backupper
+  #Execute every hour
+  cron: "0 * * * *" 
